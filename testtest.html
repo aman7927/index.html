@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; media-src blob:; connect-src 'none'; font-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<title>TIKA XR — True World-Locked 3D Text</title>
+<style>
+:root{--bg:#05070D;--sur:#0E1628;--sur2:#131D33;--line:rgba(126,166,255,.18);--line2:rgba(126,166,255,.4);
+--ink:#E9F1FF;--mut:#93A7CC;--dim:#5D6F92;--cyan:#38E1FF;--green:#53F2A6;--red:#FF4D6D;--amber:#FFB224;
+--mono:ui-monospace,Menlo,Consolas,monospace;--sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;-webkit-user-select:none;user-select:none}
+button,input,select{font-family:inherit}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+svg.ic{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+#fallback{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 80% 60% at 50% 30%,#10203A,#05070D 70%),linear-gradient(rgba(120,160,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(120,160,255,.05) 1px,transparent 1px);background-size:auto,44px 44px,44px 44px}
+#gl{position:fixed;inset:0;width:100%;height:100%;z-index:1;touch-action:none;cursor:grab}
+#gl:active{cursor:grabbing}
+.vignette{position:fixed;inset:0;z-index:2;pointer-events:none;background:radial-gradient(ellipse 120% 100% at 50% 50%,transparent 55%,rgba(5,7,13,.55))}
+.top{position:fixed;top:0;left:0;right:0;z-index:10;display:flex;align-items:center;gap:10px;padding:12px 16px;background:linear-gradient(180deg,rgba(5,7,13,.85),transparent);pointer-events:none}
+.top>*{pointer-events:auto}
+.logo{display:flex;align-items:center;gap:9px}.logo .mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--cyan),var(--green));display:flex;align-items:center;justify-content:center;color:#04121C;font-weight:900}
+.logo b{font-size:17px;font-weight:900;letter-spacing:.04em}.logo small{display:block;font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:.14em;text-transform:uppercase}
+.top .sp{flex:1}
+.badge{font-family:var(--mono);font-size:10px;color:var(--green);border:1px solid rgba(83,242,166,.35);background:rgba(83,242,166,.08);padding:5px 10px;border-radius:99px}
+.ibtn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:9px;border:1px solid var(--line2);background:rgba(14,22,40,.85);color:var(--mut);cursor:pointer}
+.ibtn.on{color:var(--cyan);border-color:var(--cyan)}
+.hud{position:fixed;top:62px;left:16px;z-index:10;font-family:var(--mono);font-size:10.5px;color:var(--mut);background:rgba(5,7,13,.7);border:1px solid var(--line);border-radius:10px;padding:8px 12px;line-height:1.7;pointer-events:none}
+.hud b{color:var(--cyan)}.hud .g{color:var(--green)}.hud .a{color:var(--amber)}.hud .r{color:var(--red)}
+.support{position:fixed;top:62px;right:16px;z-index:10;max-width:250px;font-size:11px;line-height:1.5;background:rgba(10,16,29,.9);border:1px solid var(--line2);border-radius:11px;padding:10px 12px;color:var(--mut)}
+.support b{color:var(--ink)}.support .ok{color:var(--green)}.support .no{color:var(--red)}
+.panel{position:fixed;top:150px;right:16px;bottom:96px;width:280px;z-index:10;overflow-y:auto;background:rgba(10,16,29,.9);border:1px solid var(--line2);border-radius:16px;padding:16px;scrollbar-width:thin;scrollbar-color:#2A3E6B transparent}
+.panel::-webkit-scrollbar{width:7px}.panel::-webkit-scrollbar-thumb{background:#2A3E6B;border-radius:6px}
+.panel h3{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--cyan);margin:4px 0 12px}
+.ctl{margin-bottom:13px}.ctl-l{display:flex;justify-content:space-between;font-size:11.5px;color:var(--mut);margin-bottom:5px}.ctl-l output{font-family:var(--mono);color:var(--cyan)}
+.ctl input[type=text]{width:100%;background:var(--bg);border:1px solid var(--line2);color:var(--ink);font-size:14px;font-weight:700;padding:9px 11px;border-radius:9px;outline:none}
+.ctl input[type=text]:focus{border-color:var(--cyan)}
+input[type=range]{width:100%;appearance:none;-webkit-appearance:none;height:5px;border-radius:4px;background:linear-gradient(90deg,var(--cyan) var(--fill,50%),#1B2A4C var(--fill,50%));cursor:pointer}
+input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#EAF9FF;border:3px solid var(--cyan)}
+input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:#EAF9FF;border:3px solid var(--cyan)}
+.swatches{display:flex;gap:7px;flex-wrap:wrap}.sw{width:26px;height:26px;border-radius:7px;border:2px solid transparent;cursor:pointer}.sw.on{border-color:#fff;transform:scale(1.12)}
+.switch{display:flex;align-items:center;gap:9px;cursor:pointer;margin-bottom:10px;font-size:12px;color:var(--mut)}.switch input{display:none}
+.switch .tr{width:36px;height:20px;border-radius:99px;background:#1B2A4C;border:1px solid var(--line2);position:relative;flex:none}.switch .tr::after{content:"";position:absolute;left:2px;top:2px;width:14px;height:14px;border-radius:50%;background:var(--dim);transition:.2s}
+.switch input:checked+.tr{background:#0E5F7A;border-color:var(--cyan)}.switch input:checked+.tr::after{left:18px;background:var(--cyan)}
+.btn{display:flex;align-items:center;justify-content:center;gap:7px;border:1px solid var(--line2);background:var(--sur2);color:var(--ink);padding:9px 12px;border-radius:10px;font-size:12.5px;font-weight:600;cursor:pointer;width:100%}
+.btn.prime{background:linear-gradient(135deg,var(--cyan),#4D9FFF);color:#04121C;border:none}
+.btn.ok{background:linear-gradient(135deg,var(--green),#2BC98A);color:#032015;border:none}
+.note{font-size:10.5px;color:var(--dim);border-top:1px dashed var(--line);padding-top:10px;margin-top:6px;line-height:1.5}
+.actionbar{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:11;display:flex;gap:10px}
+.bigbtn{display:flex;align-items:center;gap:9px;padding:14px 22px;border-radius:14px;font-size:15px;font-weight:800;cursor:pointer;border:none;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+.bigbtn.ar{background:linear-gradient(135deg,var(--cyan),#4D9FFF);color:#04121C}
+.bigbtn.place{background:linear-gradient(135deg,var(--green),#2BC98A);color:#032015}
+.bigbtn:disabled{opacity:.5;cursor:not-allowed}
+/* AR dom-overlay */
+#overlay{position:fixed;inset:0;z-index:20;display:none;pointer-events:none}
+#arControls{position:absolute;left:12px;right:12px;bottom:14px;pointer-events:auto;background:rgba(8,12,22,.82);border:1px solid var(--line2);border-radius:16px;padding:12px}
+#arStatus{font-family:var(--mono);font-size:11px;color:var(--green);text-align:center;margin-bottom:9px}
+#arControls .row{display:flex;gap:8px;margin-top:8px}#arControls .row>*{flex:1}
+#arControls input[type=text]{width:100%;background:var(--bg);border:1px solid var(--line2);color:var(--ink);font-weight:700;padding:8px 10px;border-radius:8px;outline:none}
+#arTop{position:absolute;top:14px;left:12px;right:12px;display:flex;justify-content:space-between;pointer-events:auto}
+#arHint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:13px;color:var(--ink);background:rgba(8,12,22,.7);border:1px solid var(--line2);padding:10px 16px;border-radius:12px;pointer-events:none;text-align:center;max-width:80vw}
+.help{position:fixed;inset:0;z-index:30;background:rgba(4,7,14,.85);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:.3s}
+.help.open{opacity:1;pointer-events:auto}
+.help-card{max-width:540px;width:100%;max-height:85vh;overflow-y:auto;background:var(--sur);border:1px solid var(--line2);border-radius:18px;padding:24px}
+.help-card h2{font-size:20px;margin-bottom:6px}.help-card .sub{color:var(--mut);font-size:13px;margin-bottom:16px}
+.help-card ol{list-style:none;counter-reset:t;display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.help-card li{counter-increment:t;display:flex;gap:11px;font-size:13px;color:var(--mut)}
+.help-card li::before{content:counter(t,decimal-leading-zero);font-family:var(--mono);font-size:10px;color:var(--green);border:1px solid rgba(83,242,166,.4);border-radius:6px;padding:2px 6px;height:fit-content;flex:none}
+.help-card li b{color:var(--ink)}.help-card code{font-family:var(--mono);font-size:11px;color:var(--cyan);background:rgba(56,225,255,.08);padding:1px 5px;border-radius:4px}
+.honest{border:1px solid rgba(255,178,36,.35);background:rgba(255,178,36,.06);border-radius:11px;padding:12px;font-size:12px;color:#FFD48A;margin-bottom:16px;line-height:1.55}
+.toasts{position:fixed;top:60px;left:50%;transform:translateX(-50%);z-index:40;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
+.toast{background:rgba(14,22,40,.95);border:1px solid var(--line2);border-radius:11px;padding:10px 16px;font-size:13px;box-shadow:0 10px 30px rgba(0,0,0,.5);opacity:0;transform:translateY(-10px);transition:.3s;max-width:90vw;text-align:center}
+.toast.in{opacity:1;transform:none}.toast.success{border-color:rgba(83,242,166,.5)}.toast.error{border-color:rgba(255,77,109,.5)}.toast.warn{border-color:rgba(255,178,36,.5)}
+@media(max-width:720px){.panel{top:auto;left:12px;right:12px;bottom:88px;width:auto;max-height:38vh}.support{display:none}.hud{top:58px;left:12px;font-size:9.5px}.bigbtn{padding:12px 16px;font-size:13px}.logo small{display:none}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-ar" viewBox="0 0 24 24"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M12 12l8-4.5M12 12v9M12 12L4 7.5"/></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.6"/></symbol>
+<symbol id="i-vol" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/></symbol>
+<symbol id="i-mute" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="m17 9 5 6M22 9l-5 6"/></symbol>
+<symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.8.4-1 .9-1 1.7M12 17v.3"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+<symbol id="i-reset" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5"/></symbol>
+</defs></svg>
+
+<div id="fallback"></div>
+<canvas id="gl"></canvas>
+<div class="vignette"></div>
+
+<div id="previewUI">
+  <header class="top">
+    <div class="logo"><span class="mark">T</span><span><b>TIKA XR</b><small>true world-lock · WebXR</small></span></div>
+    <div class="sp"></div><span class="badge">NET 0 · LOCAL</span>
+    <button class="ibtn on" id="soundBtn"><svg class="ic"><use href="#i-vol"/></svg></button>
+    <button class="ibtn" id="helpBtn"><svg class="ic"><use href="#i-help"/></svg></button>
+  </header>
+  <div class="hud">FPS <b id="hFps">--</b> · draws <b id="hDraw">0</b><br>mode <span class="g" id="hMode">PREVIEW</span> · text <span class="g">FIXED</span></div>
+  <div class="support" id="support">Device check ho raha hai…</div>
+  <aside class="panel">
+    <h3>Text Controls</h3>
+    <div class="ctl"><div class="ctl-l"><span>Text</span></div><input type="text" id="cText" value="TIKA" maxlength="24"></div>
+    <div class="ctl"><div class="ctl-l"><span>Size</span><output id="oSize">1.0</output></div><input type="range" id="cSize" min="0.2" max="3" step="0.05" value="1"></div>
+    <div class="ctl"><div class="ctl-l"><span>3D Depth</span><output id="oDepth">12</output></div><input type="range" id="cDepth" min="1" max="24" step="1" value="12"></div>
+    <div class="ctl"><div class="ctl-l"><span>Color</span></div><div class="swatches" id="swatches"></div></div>
+    <div class="ctl"><div class="ctl-l"><span>Rotate (manual)</span><output id="oYaw">0°</output></div><input type="range" id="cYaw" min="-180" max="180" step="1" value="0"></div>
+    <label class="switch"><input type="checkbox" id="cGrid" checked><span class="tr"></span><span>Reference grid (preview)</span></label>
+    <div class="ctl"><div class="ctl-l"><span>Quality</span></div><select id="cQuality" style="width:100%;background:var(--bg);border:1px solid var(--line2);color:var(--ink);padding:8px;border-radius:9px"><option value="1">Low</option><option value="1.5" selected>Medium</option><option value="2">High</option></select></div>
+    <button class="btn" id="resetBtn"><svg class="ic"><use href="#i-reset"/></svg>Reset view</button>
+    <div class="note">Preview me <b>drag</b> karke dekho. Asli world-lock ke liye <b>Enter AR</b> dabao (Android Chrome + ARCore, HTTPS/localhost).</div>
+  </aside>
+  <div class="actionbar">
+    <button class="bigbtn ar" id="arBtn"><svg class="ic" style="width:20px;height:20px"><use href="#i-ar"/></svg><span>Enter AR</span></button>
+    <button class="bigbtn place" id="placeBtn"><svg class="ic" style="width:20px;height:20px"><use href="#i-pin"/></svg><span>Preview place</span></button>
+  </div>
+</div>
+
+<div id="overlay">
+  <div id="arTop">
+    <span class="badge">TIKA XR · LIVE</span>
+    <button class="ibtn" id="arExitTop" style="pointer-events:auto"><svg class="ic"><use href="#i-x"/></svg></button>
+  </div>
+  <div id="arHint">Phone dheere ghumao — surface dhundho.<br>Ring dikhe to <b>tap</b> karke text lagao.</div>
+  <div id="arControls">
+    <div id="arStatus">surface scan…</div>
+    <input type="text" id="arText" value="TIKA" maxlength="24">
+    <div class="row">
+      <input type="range" id="arSize" min="0.2" max="3" step="0.05" value="1">
+      <input type="range" id="arDepth" min="1" max="24" step="1" value="12">
+    </div>
+    <div class="row">
+      <button class="btn ok" id="arReplace"><svg class="ic"><use href="#i-pin"/></svg>Re-place</button>
+      <button class="btn" id="arExit"><svg class="ic"><use href="#i-x"/></svg>Exit AR</button>
+    </div>
+  </div>
+</div>
+
+<div class="help" id="help">
+  <div class="help-card">
+    <h2>TIKA XR — setup + test</h2>
+    <div class="sub">True world-lock: text real surface pe anchor hota hai, tum chalke dekho to bhi wahin rehta hai.</div>
+    <div class="honest"><b>Requirements:</b> Android + Chrome + ARCore ("Google Play Services for AR"). <b>iOS Safari support nahi.</b> Page <b>HTTPS ya localhost</b> pe khulna chahiye — file:// se AR nahi chalega.</div>
+    <ol>
+      <li><span><b>USB wala tareeka (fully local):</b> PC pe folder me <code>python -m http.server 8000</code> chalaо. Phone USB se jodo, USB debugging on, phir <code>adb reverse tcp:8000 tcp:8000</code>. Phone Chrome me kholo <code>http://localhost:8000/tika-xr.html</code> — ye secure context mana jata hai.</span></li>
+      <li><span><b>Ya HTTPS:</b> file ko kisi bhi static HTTPS host pe daal do (GitHub Pages / Netlify). Tool khud koi network request nahi karta — sirf page serve hota hai.</span></li>
+      <li><span>Page kholo → <b>Enter AR</b> → camera permission <b>Allow</b>.</span></li>
+      <li><span>Phone dheere ghumao, zameen/table pe <b>green ring</b> aayegi → <b>tap</b> karo → text anchor.</span></li>
+      <li><span>Ab <b>chalke</b> idhar-udhar dekho — text wahin tika rahega (6DoF SLAM). Yahi true world-lock hai.</span></li>
+      <li><span><b>Re-place</b> se dobara lagao, <b>Exit</b> se bahar.</span></li>
+    </ol>
+    <button class="btn prime" id="helpClose">Chalu karo</button>
+  </div>
+</div>
+<div class="toasts" id="toasts"></div>
+
+<script>
+"use strict";
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),D2R=Math.PI/180;
+const CFG={text:"TIKA",size:1,depth:12,color:[0.22,0.88,1],yaw:0,grid:true,quality:1.5,sound:true};
+const COLORS=[[0.22,0.88,1],[0.33,0.95,0.65],[1,0.36,0.85],[1,0.7,0.14],[1,0.3,0.43],[0.9,0.95,1]];
+
+/* ---- state ---- */
+let gl,prog,textTex,ringTex,textQuad,flatQuad,gridBuf,gridCount=0,texAspect=2,LOC={};
+let previewRaf=null,inAR=false,xrSession=null,xrRefSpace=null,hitTestSource=null;
+let placed=false,placedPos=[0,0,-2.5],placedYaw=0,xrAnchor=null,lastHit=null,lastHitMatrix=null,reticleVisible=false,lastViewerPos=[0,0,0];
+let previewAnchor={pos:[0,0,-2.5],yaw:0},viewYaw=0,viewPitch=0;
+let frames=0,fpsT=0,drawCalls=0,arSupported=false;
+
+/* ---- math ---- */
+const mI=()=>new Float32Array([1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]);
+function mMul(a,b){const o=new Float32Array(16);for(let c=0;c<4;c++)for(let r=0;r<4;r++)o[c*4+r]=a[r]*b[c*4]+a[4+r]*b[c*4+1]+a[8+r]*b[c*4+2]+a[12+r]*b[c*4+3];return o;}
+const mT=(x,y,z)=>{const m=mI();m[12]=x;m[13]=y;m[14]=z;return m;};
+const mS=s=>{const m=mI();m[0]=m[5]=m[10]=s;return m;};
+const mRy=a=>{const c=Math.cos(a),s=Math.sin(a);return new Float32Array([c,0,-s,0,0,1,0,0,s,0,c,0,0,0,0,1]);};
+function mPersp(f,asp,n,fr){const t=1/Math.tan(f/2),nf=1/(n-fr);return new Float32Array([t/asp,0,0,0,0,t,0,0,0,0,(fr+n)*nf,-1,0,0,2*fr*n*nf,0]);}
+function qMul(a,b){return[a[3]*b[0]+a[0]*b[3]+a[1]*b[2]-a[2]*b[1],a[3]*b[1]-a[0]*b[2]+a[1]*b[3]+a[2]*b[0],a[3]*b[2]+a[0]*b[1]-a[1]*b[0]+a[2]*b[3],a[3]*b[3]-a[0]*b[0]-a[1]*b[1]-a[2]*b[2]];}
+function qMat(q){const[x,y,z,w]=q;return new Float32Array([1-2*(y*y+z*z),2*(x*y+z*w),2*(x*z-y*w),0,2*(x*y-z*w),1-2*(x*x+z*z),2*(y*z+x*w),0,2*(x*z+y*w),2*(y*z-x*w),1-2*(x*x+y*y),0,0,0,0,1]);}
+function viewFromQ(q){const R=qMat(q);return new Float32Array([R[0],R[4],R[8],0,R[1],R[5],R[9],0,R[2],R[6],R[10],0,0,0,0,1]);}
+function dragQ(){const cy=Math.cos(viewYaw/2),sy=Math.sin(viewYaw/2),cp=Math.cos(viewPitch/2),sp=Math.sin(viewPitch/2);return qMul([0,sy,0,cy],[sp,0,0,cp]);}
+
+/* ---- sound / toast ---- */
+const Snd={ctx:null,beep(f0,f1,d,t,v){if(!CFG.sound)return;try{if(!this.ctx)this.ctx=new(window.AudioContext||window.webkitAudioContext)();const c=this.ctx;if(c.state==="suspended")c.resume();const o=c.createOscillator(),g=c.createGain();o.type=t;o.frequency.setValueAtTime(f0,c.currentTime);o.frequency.exponentialRampToValueAtTime(Math.max(f1,1),c.currentTime+d);g.gain.setValueAtTime(v,c.currentTime);g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+d);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+d+.02);}catch(e){}},
+place(){this.beep(520,880,.14,"sine",.18)},on(){this.beep(440,660,.12,"sine",.16)},off(){this.beep(660,330,.12,"sine",.16)},tick(){this.beep(1200,1200,.04,"square",.08)},err(){this.beep(180,110,.2,"sawtooth",.14)}};
+function toast(m,t="info",ms=3200){const b=$("#toasts"),e=document.createElement("div");e.className="toast "+t;e.textContent=m;b.appendChild(e);requestAnimationFrame(()=>e.classList.add("in"));setTimeout(()=>{e.classList.remove("in");setTimeout(()=>e.remove(),320)},ms);while(b.children.length>3)b.firstChild.remove();}
+
+/* ---- GL ---- */
+function sh(t,s){const o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);if(!gl.getShaderParameter(o,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(o));return o;}
+function prog2(v,f){const p=gl.createProgram();gl.attachShader(p,sh(gl.VERTEX_SHADER,v));gl.attachShader(p,sh(gl.FRAGMENT_SHADER,f));gl.linkProgram(p);if(!gl.getProgramParameter(p,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(p));return p;}
+function initGL(){
+ const cv=$("#gl");gl=cv.getContext("webgl",{alpha:true,antialias:true,premultipliedAlpha:true,xrCompatible:true});
+ if(!gl){toast("WebGL nahi mila","error",6000);return false;}
+ prog=prog2("attribute vec3 aPos;attribute vec2 aUv;uniform mat4 uP,uV,uM;varying vec2 vUv;void main(){vUv=aUv;gl_Position=uP*uV*uM*vec4(aPos,1.0);}",
+ "precision mediump float;varying vec2 vUv;uniform sampler2D uTex;uniform vec3 uCol;uniform float uA;void main(){float a=texture2D(uTex,vUv).a*uA;if(a<0.02)discard;gl_FragColor=vec4(uCol*a,a);}");
+ LOC={aPos:gl.getAttribLocation(prog,"aPos"),aUv:gl.getAttribLocation(prog,"aUv"),uP:gl.getUniformLocation(prog,"uP"),uV:gl.getUniformLocation(prog,"uV"),uM:gl.getUniformLocation(prog,"uM"),uTex:gl.getUniformLocation(prog,"uTex"),uCol:gl.getUniformLocation(prog,"uCol"),uA:gl.getUniformLocation(prog,"uA")};
+ textQuad=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,textQuad);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-0.5,-0.5,0,0,1,0.5,-0.5,0,1,1,-0.5,0.5,0,0,0,0.5,0.5,0,1,0]),gl.STATIC_DRAW);
+ flatQuad=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,flatQuad);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-0.5,0,-0.5,0,1,0.5,0,-0.5,1,1,-0.5,0,0.5,0,0,0.5,0,0.5,1,0]),gl.STATIC_DRAW);
+ const v=[],y=-1.5,N=8;for(let i=-N;i<=N;i++){v.push(i,y,-N,i,y,N,-N,y,i,N,y,i);}gridCount=v.length/3;gridBuf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,gridBuf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(v),gl.STATIC_DRAW);
+ textTex=gl.createTexture();ringTex=gl.createTexture();
+ const rc=document.createElement("canvas");rc.width=rc.height=128;const rx=rc.getContext("2d");rx.strokeStyle="#fff";rx.lineWidth=7;rx.beginPath();rx.arc(64,64,46,0,7);rx.stroke();rx.fillStyle="#fff";rx.beginPath();rx.arc(64,64,7,0,7);rx.fill();
+ gl.bindTexture(gl.TEXTURE_2D,ringTex);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,rc);setTexParams();
+ gl.enable(gl.BLEND);gl.blendFunc(gl.ONE,gl.ONE_MINUS_SRC_ALPHA);gl.disable(gl.DEPTH_TEST);gl.clearColor(0,0,0,0);
+ uploadText();resize();return true;
+}
+function setTexParams(){gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);}
+function uploadText(){const t=(CFG.text||" ").slice(0,24),fs=170,pad=44,c=document.createElement("canvas");let x=c.getContext("2d");x.font="900 "+fs+"px system-ui,sans-serif";const w=Math.ceil(x.measureText(t).width)+pad*2;c.width=clamp(w,256,2048);c.height=fs+pad*2;x=c.getContext("2d");x.font="900 "+fs+"px system-ui,sans-serif";x.textAlign="center";x.textBaseline="middle";x.fillStyle="#fff";x.fillText(t,c.width/2,c.height/2+6);texAspect=c.width/c.height;gl.bindTexture(gl.TEXTURE_2D,textTex);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,c);setTexParams();}
+function resize(){const d=clamp(CFG.quality,.5,2),cv=$("#gl");cv.width=Math.round(innerWidth*d);cv.height=Math.round(innerHeight*d);if(gl&&!inAR)gl.viewport(0,0,cv.width,cv.height);}
+function bindQuad(buf){gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.enableVertexAttribArray(LOC.aPos);gl.vertexAttribPointer(LOC.aPos,3,gl.FLOAT,false,20,0);gl.enableVertexAttribArray(LOC.aUv);gl.vertexAttribPointer(LOC.aUv,2,gl.FLOAT,false,20,12);}
+function drawText(P,V,base){gl.useProgram(prog);bindQuad(textQuad);gl.uniformMatrix4fv(LOC.uP,false,P);gl.uniformMatrix4fv(LOC.uV,false,V);gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,textTex);gl.uniform1i(LOC.uTex,0);
+ const S=mS(CFG.size);S[0]*=texAspect;const gap=0.018,n=CFG.depth|0;
+ for(let i=n-1;i>=0;i--){const shade=i===0?1:clamp(1-(i/n)*0.72,0.2,1);const M=mMul(mMul(base,mT(0,0,-i*gap)),S);gl.uniformMatrix4fv(LOC.uM,false,M);gl.uniform3f(LOC.uCol,CFG.color[0]*shade,CFG.color[1]*shade,CFG.color[2]*shade);gl.uniform1f(LOC.uA,i===0?1:0.92);gl.drawArrays(gl.TRIANGLE_STRIP,0,4);drawCalls++;}}
+function drawReticle(P,V,hitM){gl.useProgram(prog);bindQuad(flatQuad);gl.uniformMatrix4fv(LOC.uP,false,P);gl.uniformMatrix4fv(LOC.uV,false,V);gl.bindTexture(gl.TEXTURE_2D,ringTex);gl.uniform1i(LOC.uTex,0);gl.uniformMatrix4fv(LOC.uM,false,mMul(hitM,mS(0.3)));gl.uniform3f(LOC.uCol,0.33,0.95,0.65);gl.uniform1f(LOC.uA,0.95);gl.drawArrays(gl.TRIANGLE_STRIP,0,4);drawCalls++;}
+function drawGrid(P,V){gl.useProgram(prog);gl.bindBuffer(gl.ARRAY_BUFFER,gridBuf);gl.enableVertexAttribArray(LOC.aPos);gl.vertexAttribPointer(LOC.aPos,3,gl.FLOAT,false,0,0);gl.disableVertexAttribArray(LOC.aUv);gl.vertexAttrib2f(LOC.aUv,0.5,0.5);gl.uniformMatrix4fv(LOC.uP,false,P);gl.uniformMatrix4fv(LOC.uV,false,V);gl.uniformMatrix4fv(LOC.uM,false,mI());gl.bindTexture(gl.TEXTURE_2D,ringTex);gl.uniform3f(LOC.uCol,0.22,0.88,1);gl.uniform1f(LOC.uA,0.12);gl.drawArrays(gl.LINES,0,gridCount);drawCalls++;}
+
+/* ---- preview loop ---- */
+function previewLoop(t){previewRaf=requestAnimationFrame(previewLoop);if(document.hidden||inAR)return;frames++;if(t-fpsT>=500){$("#hFps").textContent=Math.round(frames*1000/(t-fpsT));frames=0;fpsT=t;$("#hDraw").textContent=drawCalls;}
+ gl.bindFramebuffer(gl.FRAMEBUFFER,null);gl.viewport(0,0,$("#gl").width,$("#gl").height);gl.clear(gl.COLOR_BUFFER_BIT);drawCalls=0;
+ const cv=$("#gl"),P=mPersp(60*D2R,cv.width/cv.height,0.05,100),V=viewFromQ(dragQ());
+ if(CFG.grid)drawGrid(P,V);drawText(P,V,mMul(mT(...previewAnchor.pos),mRy(previewAnchor.yaw+CFG.yaw*D2R)));}
+
+/* ---- WebXR AR ---- */
+async function checkSupport(){const el=$("#support");let html="";
+ html+=window.isSecureContext?'<span class="ok">✓</span> secure context<br>':'<span class="no">✗</span> HTTPS/localhost chahiye<br>';
+ if(navigator.xr){html+='<span class="ok">✓</span> WebXR API<br>';try{arSupported=await navigator.xr.isSessionSupported("immersive-ar");}catch(e){arSupported=false;}html+=arSupported?'<span class="ok">✓</span> immersive-ar ready':'<span class="no">✗</span> AR supported nahi (ARCore?)';}
+ else html+='<span class="no">✗</span> WebXR nahi (Android Chrome chahiye)';
+ el.innerHTML=html;}
+async function enterAR(){
+ if(inAR)return;
+ if(!window.isSecureContext){toast("AR ke liye HTTPS/localhost chahiye — file:// nahi chalega","error",6000);$("#help").classList.add("open");return;}
+ if(!navigator.xr){toast("WebXR nahi — Android Chrome + ARCore chahiye","error",6000);return;}
+ if(!arSupported){toast("immersive-ar supported nahi — ARCore/Chrome update karo (iOS support nahi)","error",7000);return;}
+ try{
+  if(gl.makeXRCompatible)await gl.makeXRCompatible();
+  const session=await navigator.xr.requestSession("immersive-ar",{requiredFeatures:["hit-test"],optionalFeatures:["anchors","dom-overlay","local-floor"],domOverlay:{root:$("#overlay")}});
+  xrSession=session;inAR=true;placed=false;xrAnchor=null;lastHit=null;reticleVisible=false;
+  if(previewRaf){cancelAnimationFrame(previewRaf);previewRaf=null;}
+  session.updateRenderState({baseLayer:new XRWebGLLayer(session,gl,{framebufferScaleFactor:0.9,alpha:true})});
+  try{xrRefSpace=await session.requestReferenceSpace("local-floor");}catch(e){xrRefSpace=await session.requestReferenceSpace("local");}
+  const viewerSpace=await session.requestReferenceSpace("viewer");
+  hitTestSource=await session.requestHitTestSource({space:viewerSpace});
+  session.addEventListener("select",onSelect);session.addEventListener("end",onAREnd);
+  $("#previewUI").style.display="none";$("#fallback").style.display="none";$("#overlay").style.display="block";$("#arHint").style.display="block";
+  $("#hMode").textContent="AR";Snd.on();
+  session.requestAnimationFrame(onXRFrame);
+  toast("Surface dhundo → ring pe tap → text anchor","info",5000);
+ }catch(e){Snd.err();toast("AR start fail: "+(e.message||e.name),"error",6000);inAR=false;}
+}
+function onXRFrame(t,frame){
+ const session=frame.session;session.requestAnimationFrame(onXRFrame);
+ const layer=session.renderState.baseLayer;gl.bindFramebuffer(gl.FRAMEBUFFER,layer.framebuffer);gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);
+ const pose=frame.getViewerPose(xrRefSpace);if(!pose)return;
+ lastViewerPos=[pose.transform.position.x,pose.transform.position.y,pose.transform.position.z];
+ frames++;if(t-fpsT>=500){fpsT=t;frames=0;}
+ if(!placed&&hitTestSource){const hits=frame.getHitTestResults(hitTestSource);if(hits.length){lastHit=hits[0];const hp=lastHit.getPose(xrRefSpace);lastHitMatrix=hp?hp.transform.matrix:null;reticleVisible=!!lastHitMatrix;}else reticleVisible=false;}
+ if(placed&&xrAnchor){const ap=frame.getPose(xrAnchor.anchorSpace,xrRefSpace);if(ap)placedPos=[ap.transform.position.x,ap.transform.position.y,ap.transform.position.z];}
+ $("#arStatus").textContent=placed?("ANCHORED · "+(xrAnchor?"anchor":"pose")+" lock · walk around!"):(reticleVisible?"surface mila — TAP karo":"surface scan…");
+ $("#arHint").style.display=placed?"none":"block";
+ drawCalls=0;
+ for(const view of pose.views){const vp=layer.getViewport(view);gl.viewport(vp.x,vp.y,vp.width,vp.height);const P=view.projectionMatrix,V=view.transform.inverse.matrix;
+  if(!placed&&reticleVisible&&lastHitMatrix)drawReticle(P,V,lastHitMatrix);
+  if(placed)drawText(P,V,mMul(mT(...placedPos),mRy(placedYaw)));}
+}
+async function onSelect(){
+ if(placed||!lastHit||!lastHitMatrix)return;
+ const m=lastHitMatrix,pos=[m[12],m[13],m[14]];
+ placedYaw=Math.atan2(lastViewerPos[0]-pos[0],lastViewerPos[2]-pos[2]);placedPos=pos;placed=true;
+ if(lastHit.createAnchor){try{xrAnchor=await lastHit.createAnchor();}catch(e){xrAnchor=null;}}
+ Snd.place();if(navigator.vibrate)navigator.vibrate(30);
+}
+function rePlace(){if(xrAnchor&&xrAnchor.delete)try{xrAnchor.delete()}catch(e){}xrAnchor=null;placed=false;lastHit=null;reticleVisible=false;Snd.tick();}
+function onAREnd(){inAR=false;xrSession=null;hitTestSource=null;xrAnchor=null;placed=false;$("#overlay").style.display="none";$("#previewUI").style.display="";$("#fallback").style.display="";$("#hMode").textContent="PREVIEW";gl.bindFramebuffer(gl.FRAMEBUFFER,null);resize();if(!previewRaf)previewRaf=requestAnimationFrame(previewLoop);Snd.off();toast("AR band — preview mode","info",2200);}
+function exitAR(){if(xrSession)xrSession.end();}
+
+/* ---- UI ---- */
+function fill(el){el.style.setProperty("--fill",((el.value-el.min)/(el.max-el.min)*100)+"%");}
+function buildSwatches(){const b=$("#swatches");COLORS.forEach((c,i)=>{const d=document.createElement("div");d.className="sw"+(i===0?" on":"");d.style.background=`rgb(${c[0]*255},${c[1]*255},${c[2]*255})`;d.onclick=()=>{CFG.color=c;$$(".sw").forEach(s=>s.classList.remove("on"));d.classList.add("on");Snd.tick();};b.appendChild(d);});}
+function syncText(v){CFG.text=v;$("#cText").value=v;$("#arText").value=v;uploadText();}
+function bind(){
+ $("#cText").addEventListener("input",e=>syncText(e.target.value));$("#arText").addEventListener("input",e=>syncText(e.target.value));
+ const rng=(id,out,key,fmt)=>{const el=$(id);fill(el);el.addEventListener("input",()=>{CFG[key]=parseFloat(el.value);if(out)$(out).textContent=fmt(CFG[key]);fill(el);});};
+ rng("#cSize","#oSize","size",v=>v.toFixed(2));rng("#cDepth","#oDepth","depth",v=>v|0);rng("#cYaw","#oYaw","yaw",v=>Math.round(v)+"°");
+ const as=$("#arSize"),ad=$("#arDepth");fill(as);fill(ad);as.addEventListener("input",()=>{CFG.size=parseFloat(as.value);$("#cSize").value=as.value;$("#oSize").textContent=CFG.size.toFixed(2);fill(as);fill($("#cSize"));});ad.addEventListener("input",()=>{CFG.depth=parseFloat(ad.value);$("#cDepth").value=ad.value;$("#oDepth").textContent=CFG.depth|0;fill(ad);fill($("#cDepth"));});
+ $("#cGrid").onchange=e=>CFG.grid=e.target.checked;$("#cQuality").onchange=e=>{CFG.quality=parseFloat(e.target.value);resize();};
+ $("#arBtn").onclick=enterAR;$("#placeBtn").onclick=()=>{previewAnchor={pos:[0,0,-2.5],yaw:0};viewYaw=0;viewPitch=0;Snd.place();toast("Preview me text saamne rakha","info",1800);};
+ $("#resetBtn").onclick=()=>{viewYaw=0;viewPitch=0;CFG.yaw=0;$("#cYaw").value=0;$("#oYaw").textContent="0°";fill($("#cYaw"));};
+ $("#arReplace").onclick=rePlace;$("#arExit").onclick=exitAR;$("#arExitTop").onclick=exitAR;
+ $("#arControls").addEventListener("beforexrselect",e=>e.preventDefault());$("#arTop").addEventListener("beforexrselect",e=>e.preventDefault());
+ $("#soundBtn").onclick=()=>{CFG.sound=!CFG.sound;$("#soundBtn").classList.toggle("on",CFG.sound);$("#soundBtn").innerHTML=`<svg class="ic"><use href="#i-${CFG.sound?"vol":"mute"}"/></svg>`;if(CFG.sound)Snd.tick();};
+ $("#helpBtn").onclick=()=>$("#help").classList.add("open");$("#helpClose").onclick=()=>$("#help").classList.remove("open");$("#help").onclick=e=>{if(e.target.id==="help")$("#help").classList.remove("open");};
+ let dr=false,lx=0,ly=0;const cv=$("#gl");cv.addEventListener("pointerdown",e=>{if(inAR)return;dr=true;lx=e.clientX;ly=e.clientY;cv.setPointerCapture(e.pointerId);});cv.addEventListener("pointermove",e=>{if(!dr||inAR)return;viewYaw-=(e.clientX-lx)*0.005;viewPitch=clamp(viewPitch-(e.clientY-ly)*0.005,-1.4,1.4);lx=e.clientX;ly=e.clientY;});cv.addEventListener("pointerup",()=>dr=false);cv.addEventListener("pointercancel",()=>dr=false);
+ window.addEventListener("resize",resize);window.addEventListener("keydown",e=>{if(e.key==="Escape")$("#help").classList.remove("open");});
+}
+(function init(){buildSwatches();bind();["#cSize","#cDepth","#cYaw"].forEach(id=>fill($(id)));if(!initGL())return;checkSupport();previewRaf=requestAnimationFrame(previewLoop);setTimeout(()=>toast("Preview chal raha hai — asli world-lock ke liye Enter AR (Android Chrome)","info",4500),700);})();
+</script>
+</body>
+</html>
